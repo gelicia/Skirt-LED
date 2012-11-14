@@ -6,8 +6,11 @@ You will need the same FrequencyTimer2 library available here http://arduino.cc/
 
 Font implemented taken from http://www.dafont.com/minecraftia.font
 
-Todo: 
-Figure out a way to generate the bitmaps or give up, do it by hand and feel like an idiot
-Don't require characters to be 8x8
-Add other images
-Make scrolling more flexible
+pngreader is a file written by @slembcke that takes a black and white PNG file and exports it as an array of 1s and 0s. It's not a 2D array.
+
+Several of the tricksy algorithms were also written by @slembcke, who declined to putting them on his own github ;) 
+
+Todo : 
+implement the animation struct fully
+animate all of the things \o/
+
