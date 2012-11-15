@@ -75,8 +75,8 @@ struct Image {
 
 struct Animation {
   struct Image image;
-  //make unused elements 0, increase as needed
-  int frames[10];
+  //make unused elements 0, increase as needed. Frame number starts at 1 so 0s can be counted as unused frames
+  int frames[15];
 };
 
 struct Image party_image = {
@@ -100,13 +100,13 @@ struct Image spaceInv2_image = {
 };
 
 struct Image creeperExplode_image = {
-  64, 8, 
+  56, 8, 
   creeperExplode
 };
 
 struct Animation creeperExplode_anim = {
   creeperExplode_image,
- {1, 1, 2, 1, 1, 3, 4, 5, 6, 7}
+ {1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 3, 4, 5, 6, 7}
 };
 
 byte col = 0;
@@ -150,14 +150,10 @@ void setup() {
 }
 
 void loop() {
-   //delay(500);
-   //clearLeds();
-
-
-//  ScrollImage(&party_image, 60);
-  ScrollAndAlternateImage(&spaceInv_image,&spaceInv2_image,4,90);
-// setImage(&creeperExplode_image);
-//animateImage(&creeperExplode_image, 120);
+//  scrollImage(&party_image, 60);
+//  scrollAndAlternateImage(&spaceInv_image,&spaceInv2_image,4,90);
+ //setImage(&creeperExplode_image);
+//animateImage(&creeperExplode_anim, 300);
 
 }
 
@@ -172,7 +168,7 @@ void clearLeds() {
 
 //set an image
 void setImage(struct Image *image){
- setImage(image, 0); 
+ setImage(image, 1); 
 }
 
 //Set an image at a certain frame
@@ -181,7 +177,7 @@ void setImage(struct Image *image, int frame){
   int width = image -> width;
   for(int y=0; y<8; y++){
     for(int x=0; x<8; x++){
-      leds[y][x] = pixels[(y*width) + x + (frame * 8)];
+      leds[y][x] = pixels[(y*width) + x + ((frame-1) * 8)];
     } 
   }
 }
@@ -192,14 +188,43 @@ void animateImage(struct Image *image, int del){
   //assumes width is divisible by 8, all frames must be full
   int numOfFrames = (width/8)-1;
   
-  for(int frame = 0; frame <=numOfFrames; frame++){
+  for(int frame = 1; frame <=numOfFrames; frame++){
     setImage(image, frame);
     delay(del);
   }
 }
 
+//animate an image by using the Animation's frames. This allows you to use one frame multiple times
+void animateImage(struct Animation *anim, int del){
+    int numOfFrames = 0;
+    struct Image image = anim->image;
+    //Set number of frames
+    for (int i=0; i<15; i++){
+      if (anim->frames[i]>0){
+        numOfFrames++;
+      }
+    }
+    
+    int frameArr[numOfFrames];
+    int frameArrIdx = 0;
+    for(int i=0; i<15; i++){
+      if (anim->frames[i]>0){
+        frameArr[frameArrIdx] = anim->frames[i];
+        frameArrIdx++;
+      }
+    }
+    
+    Serial.println(numOfFrames);
+    
+    for(int frame=0; frame<numOfFrames; frame++){
+      setImage(&image, frameArr[frame]);
+      //Serial.println(frameArr[frame]);
+      delay(del);
+    }
+}
+
 //Scroll one image
-void ScrollImage(struct Image *image, int del){
+void scrollImage(struct Image *image, int del){
   int width = image->width;
   byte *pixels = image->pixels;
   
@@ -216,7 +241,7 @@ void ScrollImage(struct Image *image, int del){
 }
 
 //Alternate between two images while scrolling
-void ScrollAndAlternateImage(struct Image *image1, struct Image *image2, int altDelay, int del){
+void scrollAndAlternateImage(struct Image *image1, struct Image *image2, int altDelay, int del){
    //assumes the two images are the same size
   int width = image1->width;
   
