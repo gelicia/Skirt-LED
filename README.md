@@ -6,11 +6,11 @@ You will need the same FrequencyTimer2 library available here http://arduino.cc/
 
 Font implemented taken from http://www.dafont.com/minecraftia.font
 
-pngreader is a file written by [slembcke](https://github.com/slembcke) that takes a black and white PNG file and exports it as an array of 1s and 0s. It's not a 2D array.
+pngreader is a file written by [slembcke](https://github.com/slembcke) that takes a black and white PNG file and exports it as an array of 1s and 0s. It's not a 2D array. Run it through the terminal pointing to a PNG like this: './pngreader < ~/Desktop/skirt2/pacman.png'
 
 Several of the tricksy algorithms were also written by [slembcke](https://github.com/slembcke), who declined to putting them on his own github ;) 
 
 Todo : 
-implement the animation struct fully
-animate all of the things \o/
+Build out more animations and things
+Finalize the final run of the program to allow toggling between animations using the arduino's reset button
 
