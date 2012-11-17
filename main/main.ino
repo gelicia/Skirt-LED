@@ -12,6 +12,30 @@
 
 #include <FrequencyTimer2.h>
 
+static byte pacMan[] = {
+//1                        2                        3                        4                        5                        6                        7                        8
+ 0, 0, 0, 1, 1, 1, 1, 0,  0, 0, 0, 1, 1, 1, 0, 0,  0, 0, 0, 1, 1, 1, 0, 0,  0, 0, 0, 1, 1, 1, 0, 0,  0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+ 0, 0, 1, 1, 1, 1, 0, 0,  0, 0, 1, 1, 1, 1, 1, 0,  0, 0, 1, 1, 1, 1, 1, 0,  0, 0, 1, 1, 1, 1, 1, 0,  0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+ 0, 1, 1, 1, 1, 0, 0, 0,  0, 1, 1, 1, 1, 0, 0, 0,  0, 1, 1, 1, 1, 1, 1, 0,  0, 1, 1, 1, 1, 1, 1, 0,  0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 
+ 0, 1, 1, 1, 0, 0, 0, 0,  0, 1, 1, 1, 0, 0, 0, 0,  0, 1, 1, 1, 1, 0, 0, 0,  0, 1, 1, 1, 1, 1, 1, 0,  0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 
+ 0, 1, 1, 1, 1, 0, 0, 0,  0, 1, 1, 1, 1, 0, 0, 0,  0, 1, 1, 1, 1, 1, 1, 0,  0, 1, 1, 1, 1, 1, 1, 0,  0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 
+ 0, 0, 1, 1, 1, 1, 0, 0,  0, 0, 1, 1, 1, 1, 1, 0,  0, 0, 1, 1, 1, 1, 1, 0,  0, 0, 1, 1, 1, 1, 1, 0,  0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+ 0, 0, 0, 1, 1, 1, 1, 0,  0, 0, 0, 1, 1, 1, 0, 0,  0, 0, 0, 1, 1, 1, 0, 0,  0, 0, 0, 1, 1, 1, 0, 0,  0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+ 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0,  0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+};
+
+static byte pong[] = {
+  //1                      2                         3                         4                         5                         6                         7                         8                         9
+  0, 0, 0, 0, 1, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0, 
+  0, 0, 0, 0, 0, 0, 0, 1,  0, 0, 0, 1, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 1, 0, 1, 
+  0, 0, 0, 0, 0, 0, 0, 1,  0, 0, 0, 0, 0, 0, 0, 0,   1, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   1, 0, 0, 0, 0, 0, 0, 0,   1, 0, 0, 0, 0, 0, 1, 1,   0, 0, 0, 0, 0, 0, 0, 1, 
+  0, 0, 0, 0, 0, 0, 0, 0,  1, 0, 0, 0, 0, 0, 0, 1,   1, 1, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   1, 0, 0, 0, 0, 0, 0, 0,   1, 0, 0, 0, 0, 1, 0, 1,   1, 0, 0, 0, 0, 0, 0, 1,   1, 0, 0, 0, 0, 0, 0, 0, 
+  0, 0, 0, 0, 0, 0, 0, 0,  1, 0, 0, 0, 0, 0, 0, 1,   0, 0, 0, 0, 0, 0, 0, 1,   1, 0, 0, 0, 0, 0, 0, 1,   0, 0, 0, 0, 0, 0, 0, 1,   1, 0, 0, 0, 0, 0, 0, 1,   0, 0, 0, 0, 0, 0, 0, 1,   0, 0, 0, 0, 0, 0, 0, 0,   1, 0, 0, 0, 0, 0, 0, 0, 
+  1, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 1,   1, 0, 1, 0, 0, 0, 0, 1,   0, 0, 0, 0, 0, 0, 0, 1,   0, 0, 0, 0, 1, 0, 0, 1,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0, 
+  1, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   1, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0, 
+  0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   1, 0, 0, 1, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0, 
+};
+
 static byte creeperExplode[] = {
   //1                      2                        3                        4                        5                        6                        7
   0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0,  1, 1, 0, 0, 0, 1, 0, 1,  0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 
@@ -84,6 +108,11 @@ struct Image party_image = {
   party
 };
 
+struct Image pacMan_image = {
+  64, 8,
+  pacMan
+};
+
 struct Image clear_image = {
    8, 8,
    clearScreen
@@ -92,6 +121,11 @@ struct Image clear_image = {
 struct Image spaceInv_image = {
   34, 8,
   spaceInvaders
+};
+
+struct Image pong_image = {
+ 72, 8,
+  pong 
 };
 
 struct Image spaceInv2_image = {
@@ -104,6 +138,11 @@ struct Image creeperExplode_image = {
   creeperExplode
 };
 
+struct Animation pacMan_anim = {
+  pacMan_image,
+  {4, 3, 2, 1, 2, 3}
+};
+
 struct Animation creeperExplode_anim = {
   creeperExplode_image,
  {1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 3, 4, 5, 6, 7}
@@ -111,6 +150,10 @@ struct Animation creeperExplode_anim = {
 
 byte col = 0;
 byte leds[8][8];
+
+//Button code
+const int buttonPin = 19;
+int formerButtonState = 1;
 
 // pin[xx] on led matrix connected to nn on Arduino (-1 is dummy to make array start at pos 1)
 int pins[17]= {-1, 5, 4, 3, 2, 14, 15, 16, 17, 13, 12, 11, 10, 9, 8, 7, 6};
@@ -123,6 +166,11 @@ int cols[8] = {pins[13], pins[3], pins[4], pins[10], pins[06], pins[11], pins[15
 int rows[8] = {pins[5], pins[2], pins[7], pins[1], pins[12], pins[8], pins[14], pins[9]};
 
 void setup() {
+   Serial.begin(9600);           // set up Serial library at 9600 bps
+  
+  //set up button input
+  pinMode(buttonPin, INPUT);
+  
   // sets the pins as output
   for (int i = 1; i <= 16; i++) {
     pinMode(pins[i], OUTPUT);
@@ -139,8 +187,6 @@ void setup() {
 
   clearLeds();
 
-  Serial.begin(9600);           // set up Serial library at 9600 bps
-
   // Turn off toggling of pin 11
   FrequencyTimer2::disable();
   // Set refresh rate (interrupt timeout period)
@@ -149,11 +195,60 @@ void setup() {
   FrequencyTimer2::setOnOverflow(display);
 }
 
+int stateCounter = 1;
+int maxState = 5;
+
 void loop() {
-//  scrollImage(&party_image, 60);
-//  scrollAndAlternateImage(&spaceInv_image,&spaceInv2_image,4,90);
- //setImage(&creeperExplode_image);
+  int buttonState = digitalRead(buttonPin);
+  Serial.print(buttonState);
+  Serial.println(formerButtonState);
+  
+  if (buttonState == 0 && formerButtonState == 1){
+    Serial.println("button press!");
+    formerButtonState = buttonState;
+    stateCounter++;
+    if (stateCounter > maxState){
+      stateCounter = 1; 
+    }
+  }
+  else if (buttonState == 1 && formerButtonState == 0){
+    Serial.println("button depress");
+    formerButtonState = buttonState;
+  }
+  
+  Serial.println(stateCounter);
+  
+  switch (stateCounter) {
+     case 1 :
+       scrollImage(&party_image, 60);
+       break;
+     case 2 : 
+       //scrollAndAlternateImage(&spaceInv_image,&spaceInv2_image,4,90);
+       break;
+     case 3 : 
+       animateImage(&creeperExplode_anim, 300);
+       break;
+     case 4 : 
+       //animateImage(&pong_image, 120);
+       break; 
+     case 5 : 
+       animateImage(&pacMan_anim, 200);
+       break;
+     default:
+       //scrollImage(&party_image, 60);
+       break;
+  }
+  
+  //1, 3, 5 work
+  //animateImage anim works
+  
+  
+  
+ //scrollImage(&party_image, 60);
+ // scrollAndAlternateImage(&spaceInv_image,&spaceInv2_image,4,90);
 //animateImage(&creeperExplode_anim, 300);
+//animateImage(&pong_image, 120);
+//animateImage(&pacMan_anim, 200);
 
 }
 
@@ -214,11 +309,8 @@ void animateImage(struct Animation *anim, int del){
       }
     }
     
-    Serial.println(numOfFrames);
-    
     for(int frame=0; frame<numOfFrames; frame++){
       setImage(&image, frameArr[frame]);
-      //Serial.println(frameArr[frame]);
       delay(del);
     }
 }
