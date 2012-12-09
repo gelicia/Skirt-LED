@@ -9,10 +9,10 @@
  * main loop having to do anything.
  *
  */
-
+#include <avr/pgmspace.h>
 #include <FrequencyTimer2.h>
 
-static byte pacMan[] = {
+byte pacMan[] PROGMEM = {
 //1                        2                        3                        4                        5                        6                        7                        8
  0, 0, 0, 1, 1, 1, 1, 0,  0, 0, 0, 1, 1, 1, 0, 0,  0, 0, 0, 1, 1, 1, 0, 0,  0, 0, 0, 1, 1, 1, 0, 0,  0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
  0, 0, 1, 1, 1, 1, 0, 0,  0, 0, 1, 1, 1, 1, 1, 0,  0, 0, 1, 1, 1, 1, 1, 0,  0, 0, 1, 1, 1, 1, 1, 0,  0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
@@ -24,7 +24,7 @@ static byte pacMan[] = {
  0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0,  0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 };
 
-static byte pong[] = {
+ byte pong[]  PROGMEM = {
   //1                      2                         3                         4                         5                         6                         7                         8                         9
   0, 0, 0, 0, 1, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0, 
   0, 0, 0, 0, 0, 0, 0, 1,  0, 0, 0, 1, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 1, 0, 1, 
@@ -36,7 +36,7 @@ static byte pong[] = {
   0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   1, 0, 0, 1, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0, 
 };
 
-static byte creeperExplode[] = {
+ byte creeperExplode[] PROGMEM = {
   //1                      2                        3                        4                        5                        6                        7
   0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0,  1, 1, 0, 0, 0, 1, 0, 1,  0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 
   0, 1, 1, 0, 0, 1, 1, 0,  0, 1, 1, 0, 0, 0, 0, 0,  0, 1, 1, 0, 0, 1, 1, 0,  0, 1, 1, 0, 1, 1, 1, 0,  1, 0, 1, 0, 1, 0, 1, 0,  1, 0, 1, 0, 1, 0, 1, 0,  0, 0, 0, 0, 0, 0, 0, 0, 
@@ -48,7 +48,7 @@ static byte creeperExplode[] = {
   0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0,  1, 0, 0, 0, 0, 1, 0, 0,  1, 0, 0, 0, 0, 1, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 
 };
 
-static byte clearScreen[] = { 
+ byte clearScreen[] PROGMEM = { 
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 
     0, 0, 0, 0, 0, 0, 0, 0,
@@ -59,7 +59,7 @@ static byte clearScreen[] = {
     0, 0, 0, 0, 0, 0, 0, 0
 };
 
-static byte party[] = {
+ byte party[] PROGMEM = {
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0,
   0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0,
@@ -70,7 +70,7 @@ static byte party[] = {
   0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
 };
 
-static byte spaceInvaders[] = {
+ byte spaceInvaders[] PROGMEM = {
   0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0,  0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0,  0, 0, 0, 0, 1, 1, 0, 0, 0, 
   0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,  0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0,  0, 0, 0, 1, 1, 1, 1, 0, 0, 
   0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,  0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0,  0, 0, 1, 1, 1, 1, 1, 1, 0, 
@@ -81,7 +81,7 @@ static byte spaceInvaders[] = {
   0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,  0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0,  0, 1, 0, 1, 0, 0, 1, 0, 1, 
 };
 
-static byte spaceInvaders2[] = {
+ byte spaceInvaders2[] PROGMEM = {
   0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0,  0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0,  0, 0, 0, 0, 1, 1, 0, 0, 0, 
   0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,  0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1,  0, 0, 0, 1, 1, 1, 1, 0, 0, 
   0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,  0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1,  0, 0, 1, 1, 1, 1, 1, 1, 0, 
@@ -200,11 +200,8 @@ int maxState = 5;
 
 void loop() {
   int buttonState = digitalRead(buttonPin);
-  Serial.print(buttonState);
-  Serial.println(formerButtonState);
   
   if (buttonState == 0 && formerButtonState == 1){
-    Serial.println("button press!");
     formerButtonState = buttonState;
     stateCounter++;
     if (stateCounter > maxState){
@@ -212,32 +209,30 @@ void loop() {
     }
   }
   else if (buttonState == 1 && formerButtonState == 0){
-    Serial.println("button depress");
     formerButtonState = buttonState;
   }
-  
-  Serial.println(stateCounter);
   
   switch (stateCounter) {
      case 1 :
        scrollImage(&party_image, 60);
        break;
      case 2 : 
-       //scrollAndAlternateImage(&spaceInv_image,&spaceInv2_image,4,90);
+       scrollAndAlternateImage(&spaceInv_image, &spaceInv2_image, 4, 90);
        break;
      case 3 : 
        animateImage(&creeperExplode_anim, 300);
        break;
      case 4 : 
-       //animateImage(&pong_image, 120);
+       animateImage(&pong_image, 120);
        break; 
      case 5 : 
        animateImage(&pacMan_anim, 200);
        break;
      default:
-       //scrollImage(&party_image, 60);
+       scrollImage(&party_image, 60);
        break;
   }
+  
   
   //1, 3, 5 work
   //animateImage anim works
@@ -268,11 +263,11 @@ void setImage(struct Image *image){
 
 //Set an image at a certain frame
 void setImage(struct Image *image, int frame){
-  byte *pixels = image -> pixels;
+  const byte *pixels = image -> pixels;
   int width = image -> width;
   for(int y=0; y<8; y++){
     for(int x=0; x<8; x++){
-      leds[y][x] = pixels[(y*width) + x + ((frame-1) * 8)];
+      leds[y][x] = pgm_read_byte(&pixels[(y*width) + x + ((frame-1) * 8)]);
     } 
   }
 }
@@ -318,14 +313,14 @@ void animateImage(struct Animation *anim, int del){
 //Scroll one image
 void scrollImage(struct Image *image, int del){
   int width = image->width;
-  byte *pixels = image->pixels;
+  const byte *pixels = image->pixels;
   
   //iterate through each column of the image at an offset
   for(int i=0; i<width; i++){
     //update the display
     for(int y=0; y<8; y++){
       for(int x=0; x<8; x++){
-        leds[y][x] = pixels[y*width + (x + i)%width];
+        leds[y][x] = pgm_read_byte(&pixels[y*width + (x + i)%width]);
       } 
     }
     delay(del);
@@ -334,12 +329,11 @@ void scrollImage(struct Image *image, int del){
 
 //Alternate between two images while scrolling
 void scrollAndAlternateImage(struct Image *image1, struct Image *image2, int altDelay, int del){
-   //assumes the two images are the same size
   int width = image1->width;
   
   //iterate through each column of the image at an offset
   for(int i=0; i<width; i++){
-    byte *pixels ;
+    const byte *pixels ;
     if (i&altDelay) {
       pixels = image1->pixels;
     }
@@ -349,8 +343,8 @@ void scrollAndAlternateImage(struct Image *image1, struct Image *image2, int alt
     
     //update the display
     for(int y=0; y<8; y++){
-      for(int x=0; x<8; x++){      
-        leds[y][x] = pixels[y*width + (x + i)%width];
+      for(int x=0; x<8; x++){
+        leds[y][x] = pgm_read_byte(&pixels[y*width + (x + i)%width]);
       } 
     }
     delay(del);
