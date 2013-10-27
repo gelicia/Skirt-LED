@@ -11,47 +11,47 @@ typedef struct Piece {
   Pos *rotations;
 } Piece;
 
-Pos oPiece_rotations [][4] PROGMEM = {
+Pos oPiece_rotations [][4] = {
   {{0,0}, {0,-1}, {1,0}, {1,-1}}
 };
 
-Pos lPiece_rotations [][4] PROGMEM = {
+Pos lPiece_rotations [][4] = {
   {{0,0}, {1,0}, {-1,0}, {-1,1}},
   {{0,0}, {0,1}, {0,-1}, {-1,-1}},
   {{0,0}, {-1,0}, {1,0}, {1,-1}},
   {{0,0}, {0,-1}, {0,1}, {1,1}},
 };
 
-Pos jPiece_rotations [][4] PROGMEM = {
+Pos jPiece_rotations [][4] = {
   {{0,0}, {-1,0}, {1,0}, {1,1}},
   {{0,0}, {0,-1}, {0,1}, {-1,1}},
   {{0,0}, {1,0}, {-1,0}, {-1,-1}},
   {{0,0}, {0,1}, {0,-1}, {1,-1}}
 };
 
-Pos iPiece_rotations [][4] PROGMEM = {
+Pos iPiece_rotations [][4] = {
   {{0,0}, {-1,0}, {1,0}, {2,0}},
   {{0,0}, {0,1}, {0,-1}, {0,-2}}
 };
 
-Pos sPiece_rotations [][4] PROGMEM = {
+Pos sPiece_rotations [][4] = {
   {{0,0}, {1,0}, {0,1}, {-1,1}},
   {{0,0}, {0,1}, {1,1}, {1,2}}
 };
 
-Pos zPiece_rotations [][4] PROGMEM = {
+Pos zPiece_rotations [][4] = {
   {{0,0}, {-1,0}, {0,1}, {1,1}},
   {{0,0}, {0,-1}, {-1,0}, {-1,1}}
 };
 
-Pos tPiece_rotations [][4] PROGMEM = {
+Pos tPiece_rotations [][4] = {
   {{0,0}, {-1,0}, {1,0}, {0,-1}},
   {{0,0}, {0,-1}, {1,0}, {0,1}},
   {{0,0}, {-1,0}, {0,1}, {1,0}},
   {{0,0}, {0,-1}, {-1,0}, {0,1}}
 };
 
-Piece pieces[] PROGMEM = {
+Piece pieces[] = {
  {326, 1, (struct Pos*)oPiece_rotations}, //o square block
  {356, 4, (struct Pos*)lPiece_rotations}, //l block
  {122, 4, (struct Pos*)jPiece_rotations}, //j block
@@ -76,12 +76,13 @@ int clockPin = 3;
 LPD8806 strip = LPD8806(LEDsW * LEDsH, dataPin, clockPin);
 
 void setup() {
+  Serial.begin(9600);
   strip.begin();
   strip.show();
 }
 
 void loop() {
- /* int turnsPerDrop = fallRate; 
+  int turnsPerDrop = fallRate; 
   
   if (turns > turnsPerDrop){
      turns = 0;
@@ -90,19 +91,16 @@ void loop() {
   }
   else {
     turns++; 
-  }*/
+  }
   
- /* setLED(0,0,128);
-  strip.show();*/
-  
-  displayPiece(pieces[0], 0, 4, 4);
+  displayPiece(pieces[1], pieces[1].color, 0, 4, 5);
   
 }
 
-void displayPiece(struct Piece p, int rotIdx, int baseX, int baseY){
-  Pos *rotation = p.rotations[rotIdx];
+void displayPiece(struct Piece p, int pieceColor, int rotIdx, int baseX, int baseY){
+  Pos *rotation = p.rotations + (4*rotIdx);
   for (int i=0; i<=4; i++){
-    setLED(rotation[i].x + baseX, rotation[i].y+baseY, p.color);
+    setLED(rotation[i].x + baseX, rotation[i].y+baseY, pieceColor);
   }
   strip.show();
 }
