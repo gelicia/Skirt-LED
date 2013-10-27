@@ -92,13 +92,19 @@ void loop() {
     turns++; 
   }*/
   
-  setLED(0,0,128);
-  strip.show();
+ /* setLED(0,0,128);
+  strip.show();*/
+  
+  displayPiece(pieces[0], 0, 4, 4);
   
 }
 
-void displayPiece(Piece, x, y){
-  
+void displayPiece(struct Piece p, int rotIdx, int baseX, int baseY){
+  Pos *rotation = p.rotations[rotIdx];
+  for (int i=0; i<=4; i++){
+    setLED(rotation[i].x + baseX, rotation[i].y+baseY, p.color);
+  }
+  strip.show();
 }
 
 
@@ -110,7 +116,6 @@ void setLED(uint32_t x, uint32_t y, uint32_t color){
 
 //Input a value 0 to 384 to get a color value.
 //The colours are a transition r - g -b - back to r
-
 uint32_t Wheel(uint16_t WheelPos)
 {
   byte r, g, b;
