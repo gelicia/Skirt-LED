@@ -63,62 +63,172 @@ Piece pieces[] = {
 
 int points = 0;
 int fallRate = 1;
-int turns = 0;
+int ticks = 0;
 
-int xOffset = 4;
-int yOffset = -1;
-int pieceIdx = 0;
+int xOffset;
+int yOffset;
+int pieceIdx;
+int rotIdx;
 
-int joystickValX = 0;
-int joystickValY = 0;
-int joystickSelect = 0;
+int xSensorPin = A1;
+int ySensorPin = A0;
+int selectButtonPin = 12;
+
+int xJoystickOffset = 0; 
+int yJoystickOffset = 0; 
+
+const int LEFT_THRESHOLD = 20;
+const int RIGHT_THRESHOLD = 1000;
+
 const int MAX_SPEED = 5;
 
-int LEDsW = 10;
-int LEDsH = 8;
+const int LEDsW = 10;
+const int LEDsH = 8;
 int dataPin = 2;
 int clockPin = 3;
 LPD8806 strip = LPD8806(LEDsW * LEDsH, dataPin, clockPin);
 
+uint32_t blocks[LEDsW][LEDsH] = {};
+
 void setup() {
   Serial.begin(9600);
+  
+  pinMode(selectButtonPin, INPUT);
+  
   strip.begin();
   strip.show();
   randomSeed(analogRead(A2));
-  pieceIdx = random(0,7);
+  random(0,7); //call it once because it always started with 0
+  
+  yOffset = 3;
+  xOffset = 3;
+  pieceIdx = 4;//random(0,7);
+  rotIdx = 1;
+  
+  for(int i=0; i<LEDsW; i++){
+    for(int j=0; j<LEDsH; j++){
+      blocks[i][j] = 0;
+    }
+  }
 }
 
 void loop() {
-  int turnsPerDrop = fallRate; 
+  int ticksPerDrop = 20;//fallRate; 
   
-  if (turns > turnsPerDrop){
-     turns = 0;
+  int joyX = analogRead(xSensorPin);  
+  int joyY = analogRead(ySensorPin);  
+  
+  if (joyX < 20){
+    xJoystickOffset = 1;
+  }
+  else if (joyX > 1000){
+   xJoystickOffset = -1; 
+  }
+  else if (490 < joyX && joyX < 510){
+    xJoystickOffset = 0;
+  }
+  
+  if (joyY < 20){
+    yJoystickOffset = 1;
+  }
+  else if (joyY > 1000){
+   yJoystickOffset = -1; 
+  }
+  else if (490 < joyY && joyY < 510){
+    yJoystickOffset = 0;
+  }
+  
+  if (xJoystickOffset != 0) {
+     tryMove(rotIdx, xOffset + xJoystickOffset, yOffset);
+  }
+  
+  if(yJoystickOffset == 1){
+    int rotation = (rotIdx + 1) % (pieces[pieceIdx].rotationCount);
+    tryMove(rotation, xOffset, yOffset);
+  } else if(yJoystickOffset == -1){
+    tryMove(rotIdx, xOffset, yOffset + 1);
+  }
+  
+  if (ticks > ticksPerDrop){
+     ticks = 0;
      //set the old location to be black
-     displayPiece(pieces[pieceIdx], 0, 0, xOffset, yOffset);
+     displayPiece(0, xOffset, yOffset);
      
-     if (yOffset < LEDsH){
-       yOffset++;  
-     } 
-     else { //reset if reached bottom
-      yOffset = 0; 
-      pieceIdx = random(0,7);
+     if(!tryMove(rotIdx, xOffset, yOffset + 1)) { //reset if reached bottom
+       setBlocks(xOffset, yOffset);
+       // TODO check rows
+       
+       // setup new piece.
+       xOffset = 3;
+       yOffset = -2; 
+       pieceIdx = random(0,7);
      }
-     //draw the new piece
-     displayPiece(pieces[pieceIdx], pieces[pieceIdx].color, 0, xOffset, yOffset);
   }
   else {
-    turns++; 
+    ticks++; 
   }
   
-  delay(300); 
+  delay(50); 
 }
 
-void displayPiece(struct Piece p, int pieceColor, int rotIdx, int baseX, int baseY){
-  Pos *rotation = p.rotations + (4*rotIdx);
+void setBlocks(int posX, int posY)
+{
+  Pos *offsets = pieces[pieceIdx].rotations + rotIdx;
+  uint32_t color = pieces[pieceIdx].color;
+  
+  for(int i=0; i<4; i++){
+    int x = posX + offsets[i].x;
+    int y = posY + offsets[i].y;
+    
+    if(0 <= x && x < LEDsW && 0 <= y && y < LEDsH){
+      blocks[x][y] = color;
+    }
+  }
+}
+
+bool tryMove(int rotation, int posX, int posY)
+{
+   //set the old location to be black
+   displayPiece(0, xOffset, yOffset);
+   
+   bool unblocked = checkMove(rotation, posX, posY);
+   if(unblocked){
+     xOffset = posX;
+     yOffset = posY;
+     rotIdx = rotation;
+   }
+   
+   displayPiece(pieces[pieceIdx].color, xOffset, yOffset);
+   
+   return unblocked;
+}
+
+bool checkMove(int rotation, int posX, int posY)
+{
+  Pos *offsets = pieces[pieceIdx].rotations + rotation;
+  
+  for(int i=0; i<4; i++){
+    int x = posX + offsets[i].x;
+    int y = posY + offsets[i].y;
+    
+    if(y >= LEDsH){
+      return false;
+    } else if(x < 0 || LEDsW <= x){
+      return false;
+    } else if(y > 0 && blocks[x][y] != 0){
+      return false;
+    }
+  }
+  
+  return true;
+}
+
+void displayPiece(int pieceColor, int baseX, int baseY){
+  Pos *offsets = pieces[pieceIdx].rotations + rotIdx;
   
   for (int i=0; i<=4; i++){
-    int newX = rotation[i].x + baseX;
-    int newY = rotation[i].y + baseY;
+    int newX = offsets[i].x + baseX;
+    int newY = offsets[i].y + baseY;
 
     setLED(newX, newY, pieceColor);
   }

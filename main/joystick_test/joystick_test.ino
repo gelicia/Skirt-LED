@@ -34,9 +34,9 @@ void loop() {
    
    outString = outString + selectButtonValue;
    
-  // String commaString = ", ";  
-  //String serialString = xSensorValue + commaString + ySensorValue;*/
-  Serial.println(outString);
+  String commaString = ", ";  
+  String serialString = xSensorValue + commaString + ySensorValue;
+  Serial.println(serialString);
 
   delay(50);
    
