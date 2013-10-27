@@ -113,7 +113,7 @@ void setup() {
 }
 
 void loop() {
-  int ticksPerDrop = 20;//fallRate; 
+  int ticksPerDrop = 20; //20 ticks before the piece moves down
   
   int joyX = analogRead(xSensorPin);  
   int joyY = analogRead(ySensorPin);  
@@ -155,16 +155,15 @@ void loop() {
   
   if (ticks > ticksPerDrop){
      ticks = 0;
-     //set the old location to be black
-     
      if(!tryMove(rotIdx, xOffset, yOffset + 1)) { //reset if reached bottom
+       //save the screen
        setBlocks(xOffset, yOffset);
-       
-       // TODO check rows
+       clearRows();
        
        // setup new piece.
        xOffset = 3;
        yOffset = -2; 
+       rotIdx = 0;
        pieceIdx = random(0,7);
      }
   }
@@ -172,9 +171,11 @@ void loop() {
     ticks++; 
   }
   
+  strip.show();
   delay(100); 
 }
 
+//saves the screen in a array
 void setBlocks(int posX, int posY)
 {
   Pos *offsets = pieces[pieceIdx].rotations + (4 * rotIdx);
@@ -190,8 +191,12 @@ void setBlocks(int posX, int posY)
   }
 }
 
-/* erases the old draw, checks to see if it's valid, changes the values if so
-then draws based on those values */
+/* 
+erases the old position of the piece
+if the position is a valid place, it changes the values
+if the position is not, it does nothing
+
+it draws the shape with the values, changed or not*/
 bool tryMove(int rotation, int posX, int posY)
 {
    //set the old location to be black
@@ -230,6 +235,45 @@ bool checkMove(int rotation, int posX, int posY)
   return true;
 }
 
+bool rowIsFull(int row){
+  for (int i=0; i<LEDsW; i++){
+    if(blocks[i][row] == 0) {return false; }
+  }
+  
+  return true;
+}
+
+void clearRows(){
+  for (int row = LEDsH-1; row>=0; row--){
+    while (rowIsFull(row)){
+      clearRow(row);
+      strip.show();
+      delay(50);
+      moveDownFrom(row);
+      strip.show();
+      delay(50);
+    }
+  }
+}
+
+void clearRow (int row) {
+  for (int i=0; i<LEDsW; i++){
+    setLED(i, row, 0);  
+    blocks[i][row] = 0;
+  }
+}
+
+void moveDownFrom(int row){
+ for  (int y = row-1; y>=0; y--){
+  for (int x = 0; x < LEDsW; x++){
+   setLED(x, y+1, blocks[x][y]);
+   blocks[x][y+1] = blocks[x][y];
+  } 
+ }
+ 
+ clearRow(0);
+}
+
 void displayPiece(int pieceColor, int baseX, int baseY){
   Pos *offsets = pieces[pieceIdx].rotations + (4* rotIdx);
   
@@ -239,8 +283,6 @@ void displayPiece(int pieceColor, int baseX, int baseY){
 
     setLED(newX, newY, pieceColor);
   }
-  
-  strip.show();
 }
 
 /*LED utility functions*/
