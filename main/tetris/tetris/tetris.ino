@@ -118,6 +118,7 @@ void loop() {
   int joyX = analogRead(xSensorPin);  
   int joyY = analogRead(ySensorPin);  
   
+  //record left or right joystick push
   if (joyX < 20){
     xJoystickOffset = 1;
   }
@@ -128,6 +129,7 @@ void loop() {
     xJoystickOffset = 0;
   }
   
+  //record up or down joystick push
   if (joyY < 20){
     yJoystickOffset = 1;
   }
@@ -138,10 +140,12 @@ void loop() {
     yJoystickOffset = 0;
   }
   
+  //if there was a joystick left or right push, move the piece
   if (xJoystickOffset != 0) {
      tryMove(rotIdx, xOffset + xJoystickOffset, yOffset);
   }
   
+  //if there was a joystick up or down push, rotate or move down
   if(yJoystickOffset == 1){
     int rotation = (rotIdx + 1) % (pieces[pieceIdx].rotationCount);
     tryMove(rotation, xOffset, yOffset);
@@ -152,10 +156,10 @@ void loop() {
   if (ticks > ticksPerDrop){
      ticks = 0;
      //set the old location to be black
-     displayPiece(0, xOffset, yOffset);
      
      if(!tryMove(rotIdx, xOffset, yOffset + 1)) { //reset if reached bottom
        setBlocks(xOffset, yOffset);
+       
        // TODO check rows
        
        // setup new piece.
@@ -168,12 +172,12 @@ void loop() {
     ticks++; 
   }
   
-  delay(50); 
+  delay(100); 
 }
 
 void setBlocks(int posX, int posY)
 {
-  Pos *offsets = pieces[pieceIdx].rotations + rotIdx;
+  Pos *offsets = pieces[pieceIdx].rotations + (4 * rotIdx);
   uint32_t color = pieces[pieceIdx].color;
   
   for(int i=0; i<4; i++){
@@ -186,6 +190,8 @@ void setBlocks(int posX, int posY)
   }
 }
 
+/* erases the old draw, checks to see if it's valid, changes the values if so
+then draws based on those values */
 bool tryMove(int rotation, int posX, int posY)
 {
    //set the old location to be black
@@ -203,9 +209,10 @@ bool tryMove(int rotation, int posX, int posY)
    return unblocked;
 }
 
+//ensures the move doesn't run into other pieces and returns true or false if the move is valid
 bool checkMove(int rotation, int posX, int posY)
 {
-  Pos *offsets = pieces[pieceIdx].rotations + rotation;
+  Pos *offsets = pieces[pieceIdx].rotations + (4* rotation);
   
   for(int i=0; i<4; i++){
     int x = posX + offsets[i].x;
@@ -224,9 +231,9 @@ bool checkMove(int rotation, int posX, int posY)
 }
 
 void displayPiece(int pieceColor, int baseX, int baseY){
-  Pos *offsets = pieces[pieceIdx].rotations + rotIdx;
+  Pos *offsets = pieces[pieceIdx].rotations + (4* rotIdx);
   
-  for (int i=0; i<=4; i++){
+  for (int i=0; i<4; i++){
     int newX = offsets[i].x + baseX;
     int newY = offsets[i].y + baseY;
 
@@ -235,7 +242,6 @@ void displayPiece(int pieceColor, int baseX, int baseY){
   
   strip.show();
 }
-
 
 /*LED utility functions*/
 void setLED(int x, int y, uint32_t color){
