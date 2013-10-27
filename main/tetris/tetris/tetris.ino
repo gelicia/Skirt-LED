@@ -1,66 +1,64 @@
 #include "LPD8806.h"
+#include "SPI.h"
 
-struct Pos {
+typedef struct Pos {
   int x, y;
-};
+} Pos;
 
-struct Piece {
+typedef struct Piece {
+  int color;
   int rotationCount;
   Pos *rotations;
-};
+} Piece;
 
-int palette[] = {
-   48, 96, 144, 192, 240, 288, 336, 384
-};
-
-struct Pos oPiece_rotations [][4] PROGMEM = {
+Pos oPiece_rotations [][4] PROGMEM = {
   {{0,0}, {0,-1}, {1,0}, {1,-1}}
 };
 
-struct Pos lPiece_rotations [][4] PROGMEM = {
+Pos lPiece_rotations [][4] PROGMEM = {
   {{0,0}, {1,0}, {-1,0}, {-1,1}},
   {{0,0}, {0,1}, {0,-1}, {-1,-1}},
   {{0,0}, {-1,0}, {1,0}, {1,-1}},
   {{0,0}, {0,-1}, {0,1}, {1,1}},
 };
 
-struct Pos jPiece_rotations [][4] PROGMEM = {
+Pos jPiece_rotations [][4] PROGMEM = {
   {{0,0}, {-1,0}, {1,0}, {1,1}},
   {{0,0}, {0,-1}, {0,1}, {-1,1}},
   {{0,0}, {1,0}, {-1,0}, {-1,-1}},
   {{0,0}, {0,1}, {0,-1}, {1,-1}}
 };
 
-struct Pos iPiece_rotations [][4] PROGMEM = {
+Pos iPiece_rotations [][4] PROGMEM = {
   {{0,0}, {-1,0}, {1,0}, {2,0}},
   {{0,0}, {0,1}, {0,-1}, {0,-2}}
 };
 
-struct Pos sPiece_rotations [][4] PROGMEM = {
+Pos sPiece_rotations [][4] PROGMEM = {
   {{0,0}, {1,0}, {0,1}, {-1,1}},
   {{0,0}, {0,1}, {1,1}, {1,2}}
 };
 
-struct Pos zPiece_rotations [][4] PROGMEM = {
+Pos zPiece_rotations [][4] PROGMEM = {
   {{0,0}, {-1,0}, {0,1}, {1,1}},
   {{0,0}, {0,-1}, {-1,0}, {-1,1}}
 };
 
-struct Pos tPiece_rotations [][4] PROGMEM = {
+Pos tPiece_rotations [][4] PROGMEM = {
   {{0,0}, {-1,0}, {1,0}, {0,-1}},
   {{0,0}, {0,-1}, {1,0}, {0,1}},
   {{0,0}, {-1,0}, {0,1}, {1,0}},
   {{0,0}, {0,-1}, {-1,0}, {0,1}}
 };
 
-struct Piece pieces[] PROGMEM = {
- {1, (struct Pos*)oPiece_rotations}, //square
- {4, (struct Pos*)lPiece_rotations}, //l block
- {4, (struct Pos*)jPiece_rotations}, //j block
- {2, (struct Pos*)sPiece_rotations}, //s block
- {2, (struct Pos*)zPiece_rotations}, //z block
- {2, (struct Pos*)iPiece_rotations}, //long block
- {4, (struct Pos*)tPiece_rotations} //t block
+Piece pieces[] PROGMEM = {
+ {326, 1, (struct Pos*)oPiece_rotations}, //o square block
+ {356, 4, (struct Pos*)lPiece_rotations}, //l block
+ {122, 4, (struct Pos*)jPiece_rotations}, //j block
+ {288, 2, (struct Pos*)sPiece_rotations}, //s block
+ {384, 2, (struct Pos*)zPiece_rotations}, //z block
+ {192, 2, (struct Pos*)iPiece_rotations}, //I long block
+ {19, 4, (struct Pos*)tPiece_rotations} //t block
 };
 
 int points = 0;
@@ -78,11 +76,12 @@ int clockPin = 3;
 LPD8806 strip = LPD8806(LEDsW * LEDsH, dataPin, clockPin);
 
 void setup() {
-
+  strip.begin();
+  strip.show();
 }
 
 void loop() {
-  int turnsPerDrop = fallRate; 
+ /* int turnsPerDrop = fallRate; 
   
   if (turns > turnsPerDrop){
      turns = 0;
@@ -91,6 +90,49 @@ void loop() {
   }
   else {
     turns++; 
-  }
+  }*/
+  
+  setLED(0,0,128);
+  strip.show();
   
 }
+
+void displayPiece(Piece, x, y){
+  
+}
+
+
+/*LED utility functions*/
+void setLED(uint32_t x, uint32_t y, uint32_t color){
+  int ledAddr = (8 * (9-x)) + (((x&1)==0)?(7-y):(y));
+  strip.setPixelColor(ledAddr, color==0?color:Wheel(color-1));
+}
+
+//Input a value 0 to 384 to get a color value.
+//The colours are a transition r - g -b - back to r
+
+uint32_t Wheel(uint16_t WheelPos)
+{
+  byte r, g, b;
+  switch(WheelPos / 128)
+  {
+    case 0:
+      r = 127 - WheelPos % 128;   //Red down
+      g = WheelPos % 128;      // Green up
+      b = 0;                  //blue off
+      break; 
+    case 1:
+      g = 127 - WheelPos % 128;  //green down
+      b = WheelPos % 128;      //blue up
+      r = 0;                  //red off
+      break; 
+    case 2:
+      b = 127 - WheelPos % 128;  //blue down 
+      r = WheelPos % 128;      //red up
+      g = 0;                  //green off
+      break; 
+  }
+  return(strip.Color(r,g,b));
+}
+
+

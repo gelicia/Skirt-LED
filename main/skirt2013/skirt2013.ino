@@ -143,7 +143,6 @@ void scrollAndAlternateImage(struct Image *image1, struct Image *image2, int alt
 void setLED(uint32_t x, uint32_t y, uint32_t color){
   int ledAddr = (8 * (9-x)) + (((x&1)==0)?(7-y):(y));
   strip.setPixelColor(ledAddr, color==0?color:Wheel(color-1));
-  //brg strip.setPixelColor(ledAddr, color==0?color:0x700000);
 }
 
 void clearLEDs(){
