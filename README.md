@@ -1,6 +1,10 @@
-Code from http://www.arduino.cc/playground/Main/DirectDriveLEDMatrix
+Hardware wise, the pins are the following 
+Joystick X A1
+Joystick Y A0
+Joystick select 12
 
-Modified to work on an LED array my dad wired up that required the row pins to be flipped.
+LED Data 2
+LED Clock 3
 
 You will need the same FrequencyTimer2 library available here http://arduino.cc/playground/Code/FrequencyTimer2 
 
@@ -10,7 +14,5 @@ pngreader is a file written by [slembcke](https://github.com/slembcke) that take
 
 Several of the tricksy algorithms were also written by [slembcke](https://github.com/slembcke), who declined to putting them on his own github ;) 
 
-Todo : 
-Build out more animations and things
-Finalize the final run of the program to allow toggling between animations using the arduino's reset button
+
 

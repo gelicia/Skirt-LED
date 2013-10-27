@@ -76,11 +76,11 @@ void setup() {
 
 void loop() {
   //scrollImage(&party_image, 60);
-  setLED(0,0,128);
+  //setLED(0,0,128);
   //strip.setPixelColor(39, strip.Color(0,   0, 127));
-  strip.show();
+  //strip.show();
   
-  //scrollAndAlternateImage(&spaceInv_image, &spaceInv2_image, 4, 90);
+  scrollAndAlternateImage(&spaceInv_image, &spaceInv2_image, 4, 90);
 }
 
 //todo fix to be dynamic
