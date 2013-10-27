@@ -64,6 +64,11 @@ Piece pieces[] = {
 int points = 0;
 int fallRate = 1;
 int turns = 0;
+
+int xOffset = 4;
+int yOffset = -1;
+int pieceIdx = 0;
+
 int joystickValX = 0;
 int joystickValY = 0;
 int joystickSelect = 0;
@@ -79,6 +84,8 @@ void setup() {
   Serial.begin(9600);
   strip.begin();
   strip.show();
+  randomSeed(analogRead(A2));
+  pieceIdx = random(0,7);
 }
 
 void loop() {
@@ -86,30 +93,46 @@ void loop() {
   
   if (turns > turnsPerDrop){
      turns = 0;
+     //set the old location to be black
+     displayPiece(pieces[pieceIdx], 0, 0, xOffset, yOffset);
      
-     
+     if (yOffset < LEDsH){
+       yOffset++;  
+     } 
+     else { //reset if reached bottom
+      yOffset = 0; 
+      pieceIdx = random(0,7);
+     }
+     //draw the new piece
+     displayPiece(pieces[pieceIdx], pieces[pieceIdx].color, 0, xOffset, yOffset);
   }
   else {
     turns++; 
   }
   
-  displayPiece(pieces[1], pieces[1].color, 0, 4, 5);
-  
+  delay(300); 
 }
 
 void displayPiece(struct Piece p, int pieceColor, int rotIdx, int baseX, int baseY){
   Pos *rotation = p.rotations + (4*rotIdx);
+  
   for (int i=0; i<=4; i++){
-    setLED(rotation[i].x + baseX, rotation[i].y+baseY, pieceColor);
+    int newX = rotation[i].x + baseX;
+    int newY = rotation[i].y + baseY;
+
+    setLED(newX, newY, pieceColor);
   }
+  
   strip.show();
 }
 
 
 /*LED utility functions*/
-void setLED(uint32_t x, uint32_t y, uint32_t color){
+void setLED(int x, int y, uint32_t color){
   int ledAddr = (8 * (9-x)) + (((x&1)==0)?(7-y):(y));
-  strip.setPixelColor(ledAddr, color==0?color:Wheel(color-1));
+  if (0 <= x && x < LEDsW && 0 <= y && y < LEDsH){
+    strip.setPixelColor(ledAddr, color==0?color:Wheel(color-1));    
+  }
 }
 
 //Input a value 0 to 384 to get a color value.
