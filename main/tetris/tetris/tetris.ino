@@ -117,7 +117,7 @@ void setup() {
 }
 
 void loop() {
-  int ticksPerDrop = 20; //20 ticks before the piece moves down
+  int ticksPerDrop = 10; //20 ticks before the piece moves down
   
   int joyX = analogRead(xSensorPin);
   int joyY = analogRead(ySensorPin);
@@ -148,7 +148,7 @@ void loop() {
   }
   
   //if there was a joystick left or right push, move the piece
-  if (newXJoystickOffset != 0 && xJoystickOffset == 0) {
+  if (newXJoystickOffset != 0) {
      tryMove(rotIdx, xOffset + xJoystickOffset, yOffset);
   }
   
@@ -177,7 +177,7 @@ void loop() {
   yJoystickOffset = newYJoystickOffset;
   
   strip.show();
-  delay(25); 
+  delay(50); 
 }
 
 void finishPiece()
