@@ -96,13 +96,17 @@ void setup() {
   pinMode(selectButtonPin, INPUT);
   
   strip.begin();
+  clearLEDs();
   strip.show();
+  
   randomSeed(analogRead(A2));
   random(0,7); //call it once because it always started with 0
   
-  yOffset = 3;
-  xOffset = 3;
-  pieceIdx = 4;//random(0,7);
+  points = 0;
+  ticks = 0;
+  yOffset = -1;
+  xOffset = 4;
+  pieceIdx = random(0,7);
   rotIdx = 1;
   
   for(int i=0; i<LEDsW; i++){
@@ -113,7 +117,7 @@ void setup() {
 }
 
 void loop() {
-  int ticksPerDrop = 20; //20 ticks before the piece moves down
+  int ticksPerDrop = 5; //20 ticks before the piece moves down
   
   int joyX = analogRead(xSensorPin);  
   int joyY = analogRead(ySensorPin);  
@@ -150,21 +154,16 @@ void loop() {
     int rotation = (rotIdx + 1) % (pieces[pieceIdx].rotationCount);
     tryMove(rotation, xOffset, yOffset);
   } else if(yJoystickOffset == -1){
-    tryMove(rotIdx, xOffset, yOffset + 1);
+    if(!tryMove(rotIdx, xOffset, yOffset + 1)){
+      finishPiece();
+      ticks = 0;
+    }
   }
   
   if (ticks > ticksPerDrop){
      ticks = 0;
      if(!tryMove(rotIdx, xOffset, yOffset + 1)) { //reset if reached bottom
-       //save the screen
-       setBlocks(xOffset, yOffset);
-       clearRows();
-       
-       // setup new piece.
-       xOffset = 3;
-       yOffset = -2; 
-       rotIdx = 0;
-       pieceIdx = random(0,7);
+       finishPiece();
      }
   }
   else {
@@ -175,8 +174,28 @@ void loop() {
   delay(100); 
 }
 
-//saves the screen in a array
-void setBlocks(int posX, int posY)
+void finishPiece()
+{
+   //save the screen
+   bool failed = setBlocks(xOffset, yOffset);
+   if(failed){
+     Serial.println(points);
+     setup();
+     
+   } else {
+     clearRows();
+     
+     // setup new piece.
+     xOffset = 3;
+     yOffset = -2; 
+     rotIdx = 0;
+     pieceIdx = random(0,7);
+   }
+}
+
+// saves the current piece into a array
+// returns true if it fails to add the block (because you lost)
+bool setBlocks(int posX, int posY)
 {
   Pos *offsets = pieces[pieceIdx].rotations + (4 * rotIdx);
   uint32_t color = pieces[pieceIdx].color;
@@ -187,8 +206,12 @@ void setBlocks(int posX, int posY)
     
     if(0 <= x && x < LEDsW && 0 <= y && y < LEDsH){
       blocks[x][y] = color;
+    } else {
+      return true;
     }
   }
+  
+  return false;
 }
 
 /* 
@@ -246,12 +269,20 @@ bool rowIsFull(int row){
 void clearRows(){
   for (int row = LEDsH-1; row>=0; row--){
     while (rowIsFull(row)){
-      clearRow(row);
-      strip.show();
-      delay(50);
+      points++;
+     
+      for(int blink=0; blink<3; blink++){
+        setWhite(row);
+        strip.show();
+        delay(50);
+        clearRow(row);
+        strip.show();
+        delay(50);
+      }
+      
       moveDownFrom(row);
       strip.show();
-      delay(50);
+      delay(150);
     }
   }
 }
@@ -260,6 +291,12 @@ void clearRow (int row) {
   for (int i=0; i<LEDsW; i++){
     setLED(i, row, 0);  
     blocks[i][row] = 0;
+  }
+}
+
+void setWhite(int row) {
+  for (int i=0; i<LEDsW; i++){
+    setLED(i, row, ~0);  
   }
 }
 
@@ -290,6 +327,14 @@ void setLED(int x, int y, uint32_t color){
   int ledAddr = (8 * (9-x)) + (((x&1)==0)?(7-y):(y));
   if (0 <= x && x < LEDsW && 0 <= y && y < LEDsH){
     strip.setPixelColor(ledAddr, color==0?color:Wheel(color-1));    
+  }
+}
+
+void clearLEDs(){
+  for(int y=0; y<LEDsH; y++){
+    for(int x=0; x<LEDsW; x++){
+      setLED(x,y,0);
+    }
   }
 }
 
