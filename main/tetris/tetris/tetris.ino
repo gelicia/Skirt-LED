@@ -74,8 +74,8 @@ int xSensorPin = A1;
 int ySensorPin = A0;
 int selectButtonPin = 12;
 
-int xJoystickOffset = 0; 
-int yJoystickOffset = 0; 
+int xJoystickOffset = 0;
+int yJoystickOffset = 0;
 
 const int LEFT_THRESHOLD = 20;
 const int RIGHT_THRESHOLD = 1000;
@@ -117,40 +117,43 @@ void setup() {
 }
 
 void loop() {
-  int ticksPerDrop = 5; //20 ticks before the piece moves down
+  int ticksPerDrop = 20; //20 ticks before the piece moves down
   
-  int joyX = analogRead(xSensorPin);  
-  int joyY = analogRead(ySensorPin);  
+  int joyX = analogRead(xSensorPin);
+  int joyY = analogRead(ySensorPin);
+  
+  int newXJoystickOffset = xJoystickOffset;
+  int newYJoystickOffset = yJoystickOffset;
   
   //record left or right joystick push
   if (joyX < 20){
-    xJoystickOffset = 1;
+    newXJoystickOffset = 1;
   }
   else if (joyX > 1000){
-   xJoystickOffset = -1; 
+   newXJoystickOffset = -1; 
   }
   else if (490 < joyX && joyX < 510){
-    xJoystickOffset = 0;
+    newXJoystickOffset = 0;
   }
   
   //record up or down joystick push
   if (joyY < 20){
-    yJoystickOffset = 1;
+    newYJoystickOffset = 1;
   }
   else if (joyY > 1000){
-   yJoystickOffset = -1; 
+   newYJoystickOffset = -1; 
   }
   else if (490 < joyY && joyY < 510){
-    yJoystickOffset = 0;
+    newYJoystickOffset = 0;
   }
   
   //if there was a joystick left or right push, move the piece
-  if (xJoystickOffset != 0) {
+  if (newXJoystickOffset != 0 && xJoystickOffset == 0) {
      tryMove(rotIdx, xOffset + xJoystickOffset, yOffset);
   }
   
   //if there was a joystick up or down push, rotate or move down
-  if(yJoystickOffset == 1){
+  if(newYJoystickOffset == 1 && yJoystickOffset == 0){
     int rotation = (rotIdx + 1) % (pieces[pieceIdx].rotationCount);
     tryMove(rotation, xOffset, yOffset);
   } else if(yJoystickOffset == -1){
@@ -170,8 +173,11 @@ void loop() {
     ticks++; 
   }
   
+  xJoystickOffset = newXJoystickOffset;
+  yJoystickOffset = newYJoystickOffset;
+  
   strip.show();
-  delay(100); 
+  delay(25); 
 }
 
 void finishPiece()
