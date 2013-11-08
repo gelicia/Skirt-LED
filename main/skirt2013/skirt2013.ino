@@ -38,6 +38,28 @@ int spaceInvaders2[] PROGMEM = {
   0, 0, 8, 8, 0, 0, 0, 0, 0, 0, 8, 8, 0,  0, 0, 0, 8, 0, 0, 0, 0, 0, 8, 0, 0,  0, 8, 0, 0, 0, 0, 0, 0, 8,
 };
 
+ int clearScreen[] PROGMEM = { 
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0
+};
+
+ int fullScreen[] PROGMEM = { 
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1
+};
+
 struct Image {
   int width, height, *pixels;
 };
@@ -56,6 +78,15 @@ struct Image spaceInv2_image = {
   spaceInvaders2
 };
 
+struct Image clear_image = {
+   8, 8,
+   clearScreen
+};
+
+struct Image full_image = {
+   8, 8,
+   fullScreen
+};
 
 // Number of RGB LEDs in strand:
 int LEDsW = 10;
@@ -81,6 +112,26 @@ void loop() {
   //strip.show();
   
   scrollAndAlternateImage(&spaceInv_image, &spaceInv2_image, 4, 90);
+  
+  //displayImage(full_image);
+}
+
+void displayImage(struct Image image){
+  int width = image.width;
+  const int* pixels = image.pixels;
+  
+  for(int y=0; y<LEDsH; y++){
+     for(int x=0; x<LEDsW; x++){
+       int colorIdx = pgm_read_byte(&pixels[y*width + x%width]);
+       int color = 0;
+       if (colorIdx != 0){
+         color = palette[colorIdx-1];
+       }
+       setLED(x, y, color); 
+        
+     } 
+   }
+    strip.show();
 }
 
 //todo fix to be dynamic

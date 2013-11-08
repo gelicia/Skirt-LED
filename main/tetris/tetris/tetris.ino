@@ -126,24 +126,24 @@ void loop() {
   int newYJoystickOffset = yJoystickOffset;
   
   //record left or right joystick push
-  if (joyX < 20){
+  if (joyX < 128){
     newXJoystickOffset = 1;
   }
-  else if (joyX > 1000){
+  else if (joyX > 896){
    newXJoystickOffset = -1; 
   }
-  else if (490 < joyX && joyX < 510){
+  else if (384 < joyX && joyX < 640){
     newXJoystickOffset = 0;
   }
   
   //record up or down joystick push
-  if (joyY < 20){
+  if (joyY < 128){
     newYJoystickOffset = 1;
   }
-  else if (joyY > 1000){
+  else if (joyY > 896){
    newYJoystickOffset = -1; 
   }
-  else if (490 < joyY && joyY < 510){
+  else if (384 < joyY && joyY < 640){
     newYJoystickOffset = 0;
   }
   
