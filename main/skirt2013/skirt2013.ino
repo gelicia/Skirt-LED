@@ -107,13 +107,10 @@ void setup() {
 
 void loop() {
   //scrollImage(&party_image, 60);
-  //setLED(0,0,128);
   //strip.setPixelColor(39, strip.Color(0,   0, 127));
   //strip.show();
   
   scrollAndAlternateImage(&spaceInv_image, &spaceInv2_image, 4, 90);
-  
-  //displayImage(full_image);
 }
 
 void displayImage(struct Image image){
@@ -173,8 +170,8 @@ void scrollAndAlternateImage(struct Image *image1, struct Image *image2, int alt
     }
     
     //update the display
-    for(int y=0; y<8; y++){
-      for(int x=0; x<10; x++){
+    for(int y=0; y<LEDsH; y++){
+      for(int x=0; x<LEDsW; x++){
         int colorIdx = pgm_read_byte(&pixels[y*width + (x + i)%width]);
         int color = 0;
         if (colorIdx != 0){
@@ -192,7 +189,7 @@ void scrollAndAlternateImage(struct Image *image1, struct Image *image2, int alt
 //sets an LED of x,y 
 //color is 0-385, with 0 being off
 void setLED(uint32_t x, uint32_t y, uint32_t color){
-  int ledAddr = (8 * (9-x)) + (((x&1)==0)?(7-y):(y));
+  int ledAddr = (LEDsH * ((LEDsW-1)-x)) + (((x&1)==0)?((LEDsH-1)-y):(y));
   strip.setPixelColor(ledAddr, color==0?color:Wheel(color-1));
 }
 
